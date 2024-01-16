@@ -1,0 +1,8 @@
+# Default ignored files
+.idea/
+/workspace.xml
+venv38/
+__pycache__/
+logs/
+models/
+*.xml
