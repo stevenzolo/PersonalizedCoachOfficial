@@ -2,7 +2,9 @@
  Official implementation of the paper: A Bi-Level Reinforcement Learning Framework for Personalized Coaching
 
 ## A Novel Interactive Coaching Paradigm.
-![](/imgs/general_bi-level_RL.png)
+<p align="center">
+  <img src="/imgs/general_bi-level_RL.png" width="400">
+</p>
 In this paper, we adopt a bi-level reinforcement learning framework to model the interaction among the coaches, 
 the students, and the task environment.
 - Lower-level RL: the student agent interacts with the task environment, like a standard RL problem.
@@ -27,7 +29,9 @@ the start square to the goal square, with available actions of {Up, Down, Left, 
 boundary do not change the agent’s position. The game complexity is heightened by introducing unknown wind forces under 
 each column, influencing the agent’s movement. An optimal path of the designed map, marked with a blue line, serves as 
 a reference.
-![](/imgs/optimal_windy_gridworld.png)
+<p align="center">
+  <img src="/imgs/optimal_windy_gridworld.png" width="400">
+</p>
 
 ### Comparison between the personalized coach and standard ones.
 Results demonstrate the coaches in both scenarios outperform standard coaches and can better facilitate student learning.
