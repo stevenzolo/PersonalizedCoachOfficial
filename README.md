@@ -2,7 +2,7 @@
  Official implementation of the paper: A Bi-Level Reinforcement Learning Framework for Personalized Coaching
 
 ## A Novel Interactive Coaching Paradigm.
-![](/imgs/general_bi-level_RL.pdf)
+![](/imgs/general_bi-level_RL.png)
 In this paper, we adopt a bi-level reinforcement learning framework to model the interaction among the coaches, 
 the students, and the task environment.
 - Lower-level RL: the student agent interacts with the task environment, like a standard RL problem.
@@ -13,7 +13,7 @@ Depending on whether the coach can provide timely suggestions to students during
 problem formulations are considered:
 Instant Coaching           |  Delayed Coaching
 :-------------------------:|:-------------------------:
-![](/imgs/instant_coach.pdf)  |  ![](/imgs/delayed_coach.pdf)
+![](/imgs/instant_coach.png)  |  ![](/imgs/delayed_coach.png)
 
 - Instant Coaching: In turn-based games (such as Go), students have the opportunity to report their intended
 actions to the coach before taking action, thus the instruction can be adopted and evaluated _instantly_.
@@ -27,17 +27,17 @@ the start square to the goal square, with available actions of {Up, Down, Left, 
 boundary do not change the agent’s position. The game complexity is heightened by introducing unknown wind forces under 
 each column, influencing the agent’s movement. An optimal path of the designed map, marked with a blue line, serves as 
 a reference.
-![](/imgs/optimal_windy_gridworld.pdf)
+![](/imgs/optimal_windy_gridworld.png)
 
 ### Comparison between the personalized coach and standard ones.
 Results demonstrate the coaches in both scenarios outperform standard coaches and can better facilitate student learning.
 Instant Scenario           |  Delayed Scenario
 :-------------------------:|:-------------------------:
-![](/imgs/instant_coach_vs_elite.pdf)  |  ![](/imgs/delayed_coach_vs_elite.pdf)
+![](/imgs/instant_coach_vs_elite.png)  |  ![](/imgs/delayed_coach_vs_elite.png)
 
 ### Coach students with varied initial skill level
 Even for the students initialized with varied skill levels, the proposed personalized coach can students achieve better 
 efficiency than their self-study.
 Instant Scenario           |  Delayed Scenario
 :-------------------------:|:-------------------------:
-![](/imgs/instant_coach_varied_level.pdf)  |  ![](/imgs/delayed_coach_varied_level.pdf)
+![](/imgs/instant_coach_varied_level.png)  |  ![](/imgs/delayed_coach_varied_level.png)
