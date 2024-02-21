@@ -1,5 +1,5 @@
 """
-Plot figures related to coach training in the paper.
+Plot figures for the paper.
 """
 import os
 import pickle
@@ -13,7 +13,7 @@ import gym_games
 from utils import lineplot_smoothly
 from hyperparams.grid_world_arguments import coach_args, student_learn_args, student_play_args
 from gym_games.wrappers import WindyWrapper
-from coach_agent import InstantCoach, DelayedCoach
+from coach_agent import InstantCoach, DelayedCoach, InstantBufferedCoach
 from train import coach_train
 
 
@@ -95,8 +95,10 @@ def finetune_student_reset_in_coach_training(
         log_folder = os.path.join("logs", "windy_grid_world", "finetune_student_reset_instant_instr_coach")
     elif coach_agent is DelayedCoach:
         log_folder = os.path.join("logs", "windy_grid_world", "finetune_student_reset_delayed_instr_coach")
+    elif coach_agent is InstantBufferedCoach:
+        log_folder = os.path.join("logs", "windy_grid_world", "finetune_student_reset_instant_buffer_coach")
     else:
-        raise NotImplementedError
+        raise NameError('Undefined coach agent')
 
     if len(os.listdir(log_folder)) > 0:
         print("Plot figure with existed log files")
@@ -227,7 +229,7 @@ def dive_into_train_eval_detail(
         )
     plt.plot(
         [1, coach_args.train_epis], [student_self_play_return, student_self_play_return],
-        '--r', label='Self-study'
+        '--r', lw=3, label='Self-study'
     )
     plt.legend().set_draggable(True)
     plt.show()
@@ -249,10 +251,59 @@ def compare_train_speed(student_reset_lst, select_first_epis):
     instant_avg_return_lst = [_load_avg_return(reset_epi, instant_log_folder)for reset_epi in student_reset_lst]
     delayed_avg_return_lst = [_load_avg_return(reset_epi, delayed_log_folder) for reset_epi in student_reset_lst]
     fig, ax1 = plt.subplots(figsize=(10, 8))
-    plt.plot(np.array(student_reset_lst), instant_avg_return_lst, lw=3, label='Instant Coach')
-    plt.plot(np.array(student_reset_lst), delayed_avg_return_lst, lw=3, label='Delayed Coach')
+    plt.plot(np.array(student_reset_lst), instant_avg_return_lst, lw=4, label='Instant Teacher')
+    plt.plot(np.array(student_reset_lst), delayed_avg_return_lst, lw=4, label='Delayed Teacher')
     plt.xlabel("Student Reset Frequency")
-    plt.ylabel("Training Average Return")
+    plt.ylabel("-Steps per Episode")
+    plt.legend().set_draggable(True)
+    plt.show()
+    return
+
+
+def dive_coach_train_speed(instant_coach_log, instant_buffer_coach_log, delayed_coach_log, smooth):
+    def _plot_coach_train(_coach_train_log, _label, _return_ax, _avg_q_ax, _color):
+        with open(_coach_train_log, 'rb') as tl:
+            train_log_dict = pickle.load(tl)
+        return_lst, avg_q_lst = [], []
+        for repeat_trial_val in train_log_dict["trial_results"]:
+            xaxis = np.arange(len(repeat_trial_val['coach_return_in_epis'])) + 1
+            return_lst.append(
+                pd.DataFrame({
+                    'Training Episodes': xaxis,
+                    '-Steps per Episode': np.array(repeat_trial_val['coach_return_in_epis'])
+                })
+            )
+            avg_q_lst.append(
+                pd.DataFrame({
+                    'Training Episodes': xaxis,
+                    'Average Q Value': np.array(repeat_trial_val['average_q_in_epis'])
+                })
+            )
+        lineplot_smoothly(
+            data=return_lst, xaxis='Training Episodes', value='-Steps per Episode', smooth=smooth,
+            **{"label": _label, 'ax': _return_ax, 'color': _color}
+        )
+        lineplot_smoothly(
+            data=avg_q_lst, xaxis='Training Episodes', value='Average Q Value', smooth=smooth,
+            **{'ax': _avg_q_ax, 'color': _color, 'ls': '--'}    # "label": _avg_q_label,
+        )
+        return
+
+    fig, ax1 = plt.subplots(figsize=(10, 8))
+    ax2 = ax1.twinx()
+    coach_log_lst = [
+        instant_coach_log,
+        # instant_buffer_coach_log,
+        delayed_coach_log
+    ]
+    label_lst = [
+        'instant coach',
+        # 'instant buffer',
+        'delayed coach (buffered)'
+    ]
+    color_lst = ['b', 'c']  # , 'g'
+    for coach_train_log, label, color in zip(coach_log_lst, label_lst, color_lst):
+        _plot_coach_train(coach_train_log, label, ax1, ax2, color)
     plt.legend().set_draggable(True)
     plt.show()
     return
@@ -275,6 +326,7 @@ if __name__ == '__main__':
     # finetune_student_reset_in_coach_training(
     #     # coach_agent=InstantCoach, select_first_epis=int(5e3),    # best 2, 1/4/8 is also ok
     #     coach_agent=DelayedCoach, select_first_epis=int(8e3),  # best 8
+    #     # coach_agent=InstantBufferedCoach, select_first_epis=int(10e3),  # best 1
     #     student_reset_lst=np.concatenate((
     #         np.power(2, np.arange(9)),  # log space for fine-grained tuning
     #         np.linspace(400, 2000, num=9, dtype=int)    # linear space for sampling plot, until student saturation
@@ -290,11 +342,18 @@ if __name__ == '__main__':
     #     eval_smooth=5   # experimental
     # )
 
-    # compare_train_speed(
-    #     student_reset_lst=np.concatenate((
-    #         np.power(2, np.arange(9)),  # log space for fine-grained tuning
-    #         np.linspace(400, 2000, num=9, dtype=int)  # linear space for sampling plot, until student saturation
-    #     )),
-    #     select_first_epis=int(1e3)
-    # )   # for small reset, delayed training is faster; larger reset, instant performs better
+    compare_train_speed(
+        student_reset_lst=np.concatenate((
+            np.power(2, np.arange(9)),  # log space for fine-grained tuning
+            np.linspace(400, 2000, num=9, dtype=int)  # linear space for sampling plot, until student saturation
+        )),
+        select_first_epis=int(1e3)
+    )   # for small reset, delayed training is faster; larger reset, instant performs better
+
+    # dive_coach_train_speed(
+    #     instant_coach_log="logs/finetune_student_reset_instant_instr_coach/reset_episodes_2",
+    #     instant_buffer_coach_log="logs/finetune_student_reset_instant_buffer_coach/reset_episodes_8",
+    #     delayed_coach_log="logs/finetune_student_reset_delayed_instr_coach/reset_episodes_8",
+    #     smooth=student_learn_args.learn_epis
+    # )
 

@@ -1,5 +1,5 @@
 """
-Plot figures related to coach evaluation in the paper.
+Plot figures for the paper.
 """
 import os
 import gymnasium as gym
@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 import gym_games
 from utils import eval_one_config
 from hyperparams.grid_world_arguments import student_play_args
-from gym_games.wrappers import WindyWrapper
+from gym_games.wrappers import WindyWrapper, CliffWrapper
 from student_agent import InstantStudent, DelayedStudent
 from train import student_learn, student_self_play
 
@@ -97,7 +97,8 @@ def standard_vs_personalized_instr(
         return
 
     fig, ax = plt.subplots(figsize=(10, 8))
-    for log_name, label in zip(['learn_from_coach', 'learn_from_elite'], ['Personalized', 'Standard']):
+    for log_name, label in zip(['learn_from_coach', 'learn_from_elite'],
+                               ['Personalized Teaching', 'Elite-player Teaching']):
         log_path = os.path.join(log_folder, log_name)
         eval_one_config(log_path, {"label": label}, smooth)
     eval_one_config(student_play_args.log_path, {"label": 'Self-study', "color": 'r', "ls": '--'}, smooth)
@@ -106,7 +107,7 @@ def standard_vs_personalized_instr(
     return
 
 
-def coach_varied_level_student(student_agent, coach_path, q_delta, smooth=10, plot=True):
+def coach_varying_level_student(student_agent, coach_path, q_delta, smooth=10, plot=True):
     # varied student self-play, and they learn under instant-coach, delayed-coach
     parent_folder = os.path.join("logs", "windy_grid_world", "finetune_q_delta_in_student_learn")
     if student_agent is InstantStudent:
@@ -114,7 +115,7 @@ def coach_varied_level_student(student_agent, coach_path, q_delta, smooth=10, pl
     elif student_agent is DelayedStudent:
         log_folder = os.path.join(parent_folder, 'coach_in_delay')
     else:
-        raise NotImplementedError
+        raise NameError("Undefined student agent")
 
     if not os.path.exists(student_play_args.log_path):
         print("Generate student self-play log first")
@@ -141,7 +142,7 @@ def coach_varied_level_student(student_agent, coach_path, q_delta, smooth=10, pl
 
     fig, ax = plt.subplots(figsize=(10, 8))
     log_lst = ['uniformed_learn', 'varied_learn', 'varied_self_play']
-    label_lst = ['Identical Learning', 'Varied Learning', 'Varied Self-study']
+    label_lst = ['Identical Learning', 'Varying Learning', 'Varying Self-study']
     for log_name, label in zip(log_lst, label_lst):
         log_path = os.path.join(log_folder, log_name)
         eval_one_config(log_path, {"label": label}, smooth)
@@ -173,15 +174,15 @@ def instruction_reward_ablation(student_agent, coach_path, smooth=10, plot=True)
         learn_kwargs['log_path'] = os.path.join(log_folder, 'only_task_reward')
         student_learn(**learn_kwargs)
 
-        learn_kwargs['evaluative_reward'] = True
-        learn_kwargs['log_path'] = os.path.join(log_folder, 'with_evaluative_reward')
+        learn_kwargs['instr_reward'] = True
+        learn_kwargs['log_path'] = os.path.join(log_folder, 'with_instr_reward')
         student_learn(**learn_kwargs)
 
     if not plot:
         return
 
     fig, ax = plt.subplots(figsize=(10, 8))
-    log_lst = ['only_task_reward', 'with_evaluative_reward']
+    log_lst = ['only_task_reward', 'with_instr_reward']
     label_lst = ['Only Task Reward', 'Task+Evaluative Reward']
     for log_name, label in zip(log_lst, label_lst):
         log_path = os.path.join(log_folder, log_name)
@@ -200,26 +201,26 @@ if __name__ == '__main__':
 
     # finetune_budget_session_in_coach_eval(
     #     budget_session_lst=[(10, 5, np.inf)],    # (advice_budget, epis_in_session, advice_sessions)
-    #     instant_coach_model_path="models/windy_grid_world/instant_coach_reset_2.pt",
-    #     delayed_coach_model_path="models/windy_grid_world/delayed_coach_reset_8.pt",
+    #     instant_coach_model_path="models/grid_world_gym/instant_coach_reset_2.pt",
+    #     delayed_coach_model_path="models/grid_world_gym/delayed_coach_reset_8.pt",
     #     smooth=5, plot=True
     # )
 
-    # standard_vs_personalized_instr(
-    #     # student_agent=InstantStudent, personal_coach_path="models/windy_grid_world/instant_coach_reset_2.pt",
-    #     student_agent=DelayedStudent, personal_coach_path="models/windy_grid_world/delayed_coach_reset_8.pt",
-    #     elite_student_path=student_play_args.model_path,
-    #     plot=True   # plot with previous log
-    # )
+    standard_vs_personalized_instr(
+        # student_agent=InstantStudent, personal_coach_path="models/instant_instr_coach_reset_1_epi.pt",
+        student_agent=DelayedStudent, personal_coach_path="models/delayed_instr_coach_reset_4_epis.pt",
+        elite_student_path=student_play_args.model_path,
+        plot=True   # plot with previous log
+    )
 
-    # coach_varied_level_student(
-    #     # student_agent=InstantStudent, coach_path="models/windy_grid_world/instant_coach_reset_2.pt",
-    #     student_agent=DelayedStudent, coach_path="models/windy_grid_world/delayed_coach_reset_8.pt",
+    # coach_varying_level_student(
+    #     # student_agent=InstantStudent, coach_path="models/instant_instr_coach_reset_1_epi.pt",
+    #     student_agent=DelayedStudent, coach_path="models/delayed_instr_coach_reset_4_epis.pt",
     #     q_delta=1.0, plot=True
     # )
 
     # instruction_reward_ablation(
-    #     # student_agent=InstantStudent, coach_path="models/windy_grid_world/instant_coach_reset_2.pt",
-    #     student_agent=DelayedStudent, coach_path="models/windy_grid_world/delayed_coach_reset_8.pt",
+    #     # student_agent=InstantStudent, coach_path="models/grid_world_gym/instant_coach_reset_2.pt",
+    #     student_agent=DelayedStudent, coach_path="models/grid_world_gym/delayed_coach_reset_8.pt",
     #     plot=True
     # )
