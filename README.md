@@ -1,25 +1,27 @@
-# Personalized Coach 
- Official implementation of the paper: A Bi-Level Reinforcement Learning Framework for Personalized Coaching
+# Personalized Teacher 
+ Official implementation of the paper: 
+ 
+ Towards Personalized Learning: A Bi-Level Reinforcement Learning Framework for Machine Teaching Human Tasks
 
-## A Novel Interactive Coaching Paradigm.
+## A Novel Interactive Teaching Paradigm.
 <p align="center">
   <img src="/imgs/general_bi-level_RL.png" width="400">
 </p>
-In this paper, we adopt a bi-level reinforcement learning framework to model the interaction among the coaches, 
+In this paper, we adopt a bi-level reinforcement learning framework to model the interaction among the teachers, 
 the students, and the task environment.
 - Lower-level RL: the student agent interacts with the task environment, like a standard RL problem.
-- Higher-level RL: the coach agent observes the lower-level interaction and offers instructions to improve 
+- Higher-level RL: the teacher agent observes the lower-level interaction and offers instructions to improve 
 the student’s policy.
 
-Depending on whether the coach can provide timely suggestions to students during the interaction, two basic
+Depending on whether the teacher can provide timely suggestions to students during the interaction, two basic
 problem formulations are considered:
-Instant Coaching           |  Delayed Coaching
+Instant Teaching           |  Delayed Teaching
 :-------------------------:|:-------------------------:
 ![](/imgs/instant_coach.png)  |  ![](/imgs/delayed_coach.png)
 
-- Instant Coaching: In turn-based games (such as Go), students have the opportunity to report their intended
-actions to the coach before taking action, thus the instruction can be adopted and evaluated _instantly_.
-- Delayed Coaching: If the coach provides instruction after the student’s action is executed, for example
+- Instant Teaching: In turn-based games (such as Go), students have the opportunity to report their intended
+actions to the teacher before taking action, thus the instruction can be adopted and evaluated _instantly_.
+- Delayed Teaching: If the teacher provides instruction after the student’s action is executed, for example
 in tennis training, the effectiveness can only be evaluated by _delaying_ the student’s adoption of this instruction until
 the next occurrence of the same task state.
 
@@ -33,14 +35,14 @@ a reference.
   <img src="/imgs/optimal_windy_gridworld.png" width="400">
 </p>
 
-### Comparison between the personalized coach and standard ones.
-Results demonstrate the coaches in both scenarios outperform standard coaches and can better facilitate student learning.
+### Comparison between the personalized teacher and elite-player teachers.
+Results demonstrate that personalized teachers in both scenarios outperform elite-player and can better facilitate student learning.
 Instant Scenario           |  Delayed Scenario
 :-------------------------:|:-------------------------:
 ![](/imgs/instant_coach_vs_elite.png)  |  ![](/imgs/delayed_coach_vs_elite.png)
 
-### Coach students with varied initial skill level
-Even for the students initialized with varied skill levels, the proposed personalized coach can students achieve better 
+### Teach students with varied initial skill levels
+Even for the students initialized with varying skill levels, the proposed personalized teacher help can students achieve better 
 efficiency than their self-study.
 Instant Scenario           |  Delayed Scenario
 :-------------------------:|:-------------------------:
