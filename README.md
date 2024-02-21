@@ -1,7 +1,7 @@
 # Personalized Teacher 
  Official implementation of the paper: 
  
- Towards Personalized Learning: A Bi-Level Reinforcement Learning Framework for Machine Teaching Human Tasks
+ Towards Personalized Learning: A Bi-Level Reinforcement Learning Approach for Machine Teaching Human Tasks
 
 ## A Novel Interactive Teaching Paradigm.
 <p align="center">
